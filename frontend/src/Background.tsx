@@ -1,3 +1,0 @@
-/**
- * Matrix style background 
- */
