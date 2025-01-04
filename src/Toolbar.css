@@ -1,0 +1,41 @@
+.navbar-brand > span {
+    color: red;
+}
+.navbar-brand:hover {
+    color: red !important;
+}
+.navbar-brand:hover > span {
+    color: white !important;
+}
+.navbar-brand {
+    color: white !important; 
+}
+/* Navbar Links */
+.navbar .nav-link {
+    color: white;
+}
+.navbar .nav-link:hover {
+    color: red;
+}
+.navbar .nav-link.active {
+color: red;
+}
+.nav {
+    border: none !important;
+    box-shadow: none !important;
+}
+.navbar {
+    border: none !important;
+    box-shadow: none !important;
+    position: fixed;
+    width: 100%;
+    top: 0%;
+    z-index: 1000;  
+
+}
+.nav-link:hover > .gh {
+    fill: red;
+}
+.gh:hover {
+    fill: red;
+}

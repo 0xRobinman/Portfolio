@@ -12,9 +12,10 @@ const router = createBrowserRouter([
   }
 ])
 
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Portfolio />
   </StrictMode>,
 )
+// npm run build
+// npm run deploy
