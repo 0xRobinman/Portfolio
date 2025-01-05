@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import './Background.css';
 
 /**
  * Matrix style background
  * Light style
- * Pourds each side of the container, which is not transparent
+ * Pours each side of the container, which is not transparent
  * It is a very light grey
  */
+
 const hiraganaStart = 0x3040, hiraganaEnd = 0x309F;
 const katakanaStart = 0x30A0, katakanaEnd = 0x30FF;
 const kanjiStart = 0x4E00, kanjiEnd = 0x9FFF;
@@ -25,224 +26,169 @@ interface NodeProps {
     head?: boolean;
     char?: string | null;
 }
+
 class Node {
 
-        x: number;
-        y: number;
-        bar: number;
-        char: string;
-        velocity: number;
-        previousChars: Node[];
-        head: boolean;
-        alpha: number;
-        colour: string;
-        trailLength: number;
-        alphaReduction: number;
+    x: number;
+    y: number;
+    bar: number;
+    char: string;
+    velocity: number;
+    previousChars: Node[];
+    head: boolean;
+    alpha: number;
+    colour: string;
+    trailLength: number;
+    alphaReduction: number;
 
-        constructor({ x, y, head = true, char = null }: NodeProps) {
-            this.x = x;
-            this.y = y;
-            this.bar = 1;
-            this.char = char ?? this.get_random_char();
-            this.velocity = this.get_random_velocity();
-            this.previousChars = [];
-            this.head = head;
-            this.alpha = 1.0;
-            this.colour = head ? 'rgba(220, 53, 69, 1)' : 'rgba(220, 53, 69, 1)';
-            this.trailLength = head ? 10 + Math.random() * 15 : 0;
-            this.alphaReduction = this.get_alphaReduction();
-        }
+    constructor({ x, y, head = true, char = null }: NodeProps) {
+        this.x = x;
+        this.y = y;
+        this.bar = 1;
+        this.char = char ?? this.getRandomChar();
+        this.velocity = this.getRandomVelocity();
+        this.previousChars = [];
+        this.head = head;
+        this.alpha = 1.0;
+        this.colour = head ? 'rgba(220, 53, 69, 1)' : 'rgba(220, 53, 69, 1)';
+        this.trailLength = head ? 10 + Math.random() * 15 : 0;
+        this.alphaReduction = this.getAlpharReduction();
+    }
 
-    get_alphaReduction() {
+    getAlpharReduction() {
         return 0.007 + Math.random() * 0.005
     }
 
-    reduce_alpha(amount :number) {
+    reduceAlpha(amount: number) {
         this.alpha -= amount
-        this.colour = 'rgba(220, 53, 69, ' + this.alpha + ')'
+        this.alpha = Math.max(this.alpha, 0);
+        this.colour = `rgba(220, 53, 69, ${this.alpha})`
     }
 
-    get_random_velocity()
-    {
+    getRandomVelocity() {
         return 0.03 + Math.random() * 0.05;
     }
 
-    get_random_char()
-    {
-        let random_range = Math.floor(Math.random() * 4);
-        random_range = rangeTuples[random_range]
+    getRandomChar() {
+        let randomRange = Math.floor(Math.random() * rangeTuples.length);
+        let randomRangeTuple = rangeTuples[randomRange]
 
-        let random_char = Math.floor(Math.random() * (random_range[1] - random_range[0] + 1) + random_range[0]);
+        let randomChar = Math.floor(Math.random() * (randomRangeTuple[1] - randomRangeTuple[0] + 1) + randomRangeTuple[0]);
         
-        return String.fromCharCode(random_char);
+        return String.fromCharCode(randomChar);
     }
     
-    move()
-    {
-
+    move() {
         this.y += this.velocity
-        
+
         if (this.y >= this.bar) {
-            this.bar+=1.2;
+            this.bar += 1.2;
 
             this.previousChars.push(new Node({x: this.x, y: this.y, head: false, char: this.char}))
 
-            this.char = this.get_random_char();
+            this.char = this.getRandomChar();
         }
+
         this.previousChars.forEach((node) => {
-            node.reduce_alpha(this.alphaReduction);
+            node.reduceAlpha(this.alphaReduction);
         })
 
-        if (this.y >= 36)
-        {
+        // Remove trail nodes that are fully transparent
+        this.previousChars = this.previousChars.filter(node => node.alpha > 0);
+
+        if (this.y >= 36) {
             this.previousChars = []
             this.trailLength = (this.head) ? 10 + Math.random() * 15 : 0
-            this.alphaReduction = this.get_alphaReduction()
+            this.alphaReduction = this.getAlpharReduction()
             this.y = 0;
             this.bar = 1.0
-            this.velocity = this.get_random_velocity()
+            this.velocity = this.getRandomVelocity()
         }
     }
 
 };
+
 const Background = () => {
-    
 
     const backgroundColour = '#212529';
     const foregroundColour = 'rgba(220, 53, 69, 1)';
-    const canvasReference = useRef(null);
-    let matrix_char_count = 30
-    
-    const [canvas_dimensions, setDimensions] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight
-    });
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const charCount = 20;
 
-    if (window.innerWidth <= 600)
-        matrix_char_count = 15;
-    else
-        matrix_char_count = 30;
-
-    let matrix_nodes = (function() {
-        
-        let arr = [];
-    
-        for (let x = 0; x < matrix_char_count; x+=2) {
-            arr.push(new Node({x: x, y: -Math.random() * 10}));
-        }
-    
-        return arr;
-    })();
-
-    let x_scaler = canvas_dimensions.width / matrix_char_count;
-    let y_scaler = canvas_dimensions.height / matrix_char_count;
-
+    const matrixNodesRef = useRef<Node[]>([]);
+    const animationFrameId = useRef<number>(0);
 
     useEffect(() => {
-        const canvas = canvasReference.current;
+        const nodes: Node[] = [];
+        for (let x = 0; x < charCount; x += 2) {
+            nodes.push(new Node({x: x, y: -Math.random() * 10}));
+        }
+        matrixNodesRef.current = nodes;
+    }, [charCount]);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-        const fix_canvas = () => {
+        const setCanvasSize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.font = `${charCount}px 'DotGothic16', sans-serif`;
+        }
 
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight
-            });
-            
-            if (window.innerWidth <= 600)
-                matrix_char_count = 15;
-            else
-                matrix_char_count = 30;
+        setCanvasSize();
 
-            x_scaler = canvas_dimensions.width / matrix_char_count;
-            y_scaler = canvas_dimensions.height / matrix_char_count;
-
-            draw_matrix(ctx);
-        }  
-
-        document.addEventListener('DOMContentLoaded', fix_canvas);
-        window.addEventListener('load', fix_canvas);
-        window.addEventListener('resize', fix_canvas);
+        window.addEventListener('resize', setCanvasSize);
 
         return () => {
-            window.removeEventListener('resize', fix_canvas);
-            window.removeEventListener('load', fix_canvas);
-            document.removeEventListener('DOMContentLoaded', fix_canvas);
+            window.removeEventListener('resize', setCanvasSize);
         };
-        
-    }, []);
+    }, [charCount]);
 
-
-    useEffect(() => {
-        const canvas = canvasReference.current;
-        const ctx = canvas.getContext('2d');
-
-        canvas_dimensions.width = canvas.width;
-        canvas_dimensions.height = canvas.height;
-        
-        draw_matrix(ctx);
-    
-    }, [canvas_dimensions]);
-
-
-    const draw_matrix = (ctx, frames=0) => {
-
-        ctx.clearRect(0, 0, canvas_dimensions.width, canvas_dimensions.height);
-
+    const drawMatrix = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
         ctx.fillStyle = backgroundColour;
+        ctx.fillRect(0, 0, width, height);
 
-        ctx.fillRect(0,0, canvas_dimensions.width, canvas_dimensions.height);
-
-        ctx.fillStyle = foregroundColour;
-    
-        matrix_nodes.forEach((node) => {
+        matrixNodesRef.current.forEach((node) => {
             node.move();
-            ctx.fillStyle = node.colour
-            ctx.fillText(node.char, node.x * x_scaler, node.y * y_scaler)
+            ctx.fillStyle = node.colour;
+            const xScaler = width / charCount;
+            const yScaler = height / charCount;
+            ctx.fillText(node.char, node.x * xScaler, node.y * yScaler)
 
-            node.previousChars.forEach((trail_node) => {
-                
-                ctx.fillStyle = trail_node.colour
-                
-
-                ctx.fillText(trail_node.char, trail_node.x * x_scaler, trail_node.y * y_scaler)
-
+            node.previousChars.forEach((trailNode) => {
+                ctx.fillStyle = trailNode.colour;
+                ctx.fillText(trailNode.char, trailNode.x * xScaler, trailNode.y * yScaler)
             })
         });
-
     }
 
     useEffect(() => {
-
-        let frames = 0;
-        let frame_id = 0;
-        const canvas = canvasReference.current;
-        
+        const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        
-        ctx.font = matrix_char_count + "px 'DotGothic16', sans-serif";
+        if (!ctx) return;
 
-        const render_matrix = () => {
-
-            draw_matrix(ctx);
-            setTimeout(() => {
-                frame_id = window.requestAnimationFrame(render_matrix);
-
-            }, 0.0001);
+        const render = () => {
+            drawMatrix(ctx, canvas.width, canvas.height);
+            animationFrameId.current = window.requestAnimationFrame(render);
         }
-        
-        render_matrix();
 
-    }); 
+        render();
+
+        return () => {
+            window.cancelAnimationFrame(animationFrameId.current);
+        }
+    }, [backgroundColour, foregroundColour, charCount]);
 
     return (
-        <canvas ref={canvasReference} 
-            width={canvas_dimensions.width} 
-            height={canvas_dimensions.height} 
-            style={{position: 'fixed',  zIndex: -2,}}
-            />
+        <canvas 
+            ref={canvasRef} 
+            style={{ position: 'fixed', top: 0, left: 0, zIndex: -2 }}
+        />
     );
-
 };
 
 export default Background;
