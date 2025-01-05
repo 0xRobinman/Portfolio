@@ -51,7 +51,6 @@ function ProjectEntry( {title, techstack, description, link, gif} : {title: stri
 
 function Projects() {
   return (
-    
 
     <Container>
 

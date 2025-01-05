@@ -39,3 +39,9 @@ color: red;
 .gh:hover {
     fill: red;
 }
+.container {
+    background-color: #212529;
+}
+#toolbar-container {
+    border-bottom: 2px solid red;
+}
