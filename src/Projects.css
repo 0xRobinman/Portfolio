@@ -2,8 +2,22 @@
     padding-left: 15px;
 }
 .card {
-
+    background-color: #343A40 !important;
+    color: white;
 }
+
 .container {
     background-color: #212529;
+}
+.tag {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    
+    border-radius: 25px;
+    padding: 7px;
+    width: auto;
+}
+.tag-holder {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
 }

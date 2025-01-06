@@ -9,6 +9,7 @@
 }
 .navbar-brand {
     color: white !important; 
+    font-size: 25px;
 }
 /* Navbar Links */
 .navbar .nav-link {
@@ -25,13 +26,15 @@ color: red;
     box-shadow: none !important;
 }
 .navbar {
+    position: relative;
     border: none !important;
     box-shadow: none !important;
-    position: fixed;
-    width: 100%;
+    width:inherit;
     top: 0%;
-    z-index: 1000;  
-
+    z-index: 1000;
+    width: 100%;
+    position: fixed;
+    background-color: #343A40 !important;
 }
 .nav-link:hover > .gh {
     fill: red;
@@ -39,9 +42,14 @@ color: red;
 .gh:hover {
     fill: red;
 }
-.container {
-    background-color: #212529;
-}
 #toolbar-container {
-    border-bottom: 2px solid red;
+    background-color: #343A40 !important;
+}
+
+#tb-c{
+    position: fixed;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    z-index: 1000;
 }
