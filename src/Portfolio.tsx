@@ -3,6 +3,7 @@ import ToolBar from './Toolbar';
 import Projects from './Projects';
 import Background from './Background';
 import { Container } from 'react-bootstrap';
+import HireMe from './Hireme';
 
 
 function Portfolio() {
@@ -11,7 +12,9 @@ function Portfolio() {
     <>
       <Background />
       <ToolBar />
-      <Container style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 1)"}}>
+      <Container style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 1)", marginTop: "-55px", paddingTop: "55px"}}>
+        <HireMe />
+        
         <Projects />
       </Container>
     </>

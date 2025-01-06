@@ -2,6 +2,7 @@ import React from "react";
 import { Card, Button, Container } from "react-bootstrap";
 import './Projects.css';
 import ItemWindow from "./Window.tsx";
+import SectionTitle from "./SectionTitle.tsx";
 
 
 
@@ -16,27 +17,46 @@ function GitHubButton({link} : {link : string}) {
 }
 
 
+
+function Tag({tag} : {tag: string}) {
+    return (
+        <div className="tag">
+            {tag}
+        </div>
+    )
+}
+
+function LanguageTags({techstack} : {techstack: string[]}) {
+    return (
+        <div className="tag-holder">
+            { techstack.map((tech, index) => {
+                return <Tag tag={tech} />
+            })}
+        </div>
+    )
+}
+
+
 /**
  * Shows a LINUX style window for each card using pure CSS
- * On hover, expand it a little bit, show more interactivity. 
+ * On hover, expand it a little bit, show more interactivity
+ * Gif will play on hover. 
+ * Tech stack will be tags
  * @param param0 
  * @returns 
  */
-function ProjectEntry( {title, techstack, description, link, gif} : {title: string, techstack: string, description: string, link: string, gif: string}) {
+function ProjectEntry( {title, techstack, link, gif} : {title: string, techstack: string[], link: string, gif: string}) {
     return (
         <ItemWindow>
-        <Card className="card" bg="dark" style={{ width: '18rem' }}>
-            <Card.Img variant="top" src={gif} />
+        <Card className="card" style={{ width: '18rem' }}>
+            <Card.Title>
+                {title}
+            </Card.Title>
             <Card.Body>
-                <Card.Title>
-                    {title}
-                </Card.Title>
+                <Card.Img variant="top" src={gif} />
                 <Card.Subtitle>
-                    {techstack}
+                    <LanguageTags techstack={techstack} />
                 </Card.Subtitle>
-                <Card.Text>
-                    {description}
-                </Card.Text>
                 <Button variant="success">
                     Source code
                     <GitHubButton link={link} />
@@ -53,27 +73,17 @@ function Projects() {
   return (
 
     <Container>
+        
+        <SectionTitle title="Projects" />
 
-        <ProjectEntry title="Packet Sniffer" techstack="Python" 
-                description="This is a project" link="" gif="holder.js/100px180" />
+        <ProjectEntry title="Packet Sniffer" techstack={["Python"]} 
+                       link="" gif="holder.js/100px180" />
 
-        <ProjectEntry title="NES Emulator" techstack="Python" 
-                        description="This is a project" link="" gif="holder.js/100px180" />
+        <ProjectEntry title="NES Emulator" techstack={["Java"]} 
+                        link="" gif="holder.js/100px180" />
 
-        <ProjectEntry title="Online Chess" techstack="Python" 
-                        description="This is a project" link="" gif="holder.js/100px180" />
-
-        <ProjectEntry title="Packet Sniffer" techstack="Python" 
-                        description="This is a project" link="" gif="holder.js/100px180" />
-
-        <ProjectEntry title="Packet Sniffer" techstack="Python" 
-                        description="This is a project" link="" gif="holder.js/100px180" />
-
-        <ProjectEntry title="Packet Sniffer" techstack="Python" 
-                        description="This is a project" link="" gif="holder.js/100px180" />
-
-        <ProjectEntry title="Packet Sniffer" techstack="Python" 
-                        description="This is a project" link="" gif="holder.js/100px180" />
+        <ProjectEntry title="Online Chess" techstack={["React", "Typescript", "NodeJS", "ExpressJS"]} 
+                        link="" gif="holder.js/100px180" />
 
     </Container>
   )

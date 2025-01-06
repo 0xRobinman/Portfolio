@@ -1,0 +1,11 @@
+#hireme-container {
+    position: relative;
+}
+#hireme-card {
+    height: 100%;
+    min-height: 100%;
+}
+#hireme-title {
+    text-align: center;
+    font-size: 20px;
+}
