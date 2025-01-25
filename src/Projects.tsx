@@ -79,8 +79,8 @@ function Projects() {
         <ProjectEntry title="Packet Sniffer" techstack={["Python"]} 
                        link="" gif="holder.js/100px180" />
 
-        <ProjectEntry title="NES Emulator" techstack={["Java"]} 
-                        link="" gif="holder.js/100px180" />
+        <ProjectEntry title="Chip8 interpreter" techstack={["Java"]} 
+                        link="" gif="game.gif" />
 
         <ProjectEntry title="Online Chess" techstack={["React", "Typescript", "NodeJS", "ExpressJS"]} 
                         link="" gif="holder.js/100px180" />
